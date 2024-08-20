@@ -79,7 +79,7 @@ services:
     networks:
       - ntwrk
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=postgresdb
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=feruza1727
