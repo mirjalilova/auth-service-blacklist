@@ -26,7 +26,7 @@ func Run(cfg *config.Config) {
 
 	// Redis Connection
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
+		Addr:     "redis_blacklist:6379",
 		Password: "",
 		DB:       0,
 	})
@@ -40,7 +40,7 @@ func Run(cfg *config.Config) {
 	userService := service.NewUserService(db)
 
 	// Kafka
-	brokers := []string{"kafka:9092"}
+	brokers := []string{"kafka_blacklist:9092"}
 	cm := kafka.NewKafkaConsumerManager()
 	pr, err := prd.NewKafkaProducer(brokers)
 	if err != nil {
