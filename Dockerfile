@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth ./cmd/
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth_blacklist ./cmd/
 
 FROM alpine:latest
 
@@ -16,11 +16,11 @@ RUN apk add --no-cache ca-certificates
 
 WORKDIR /app
 
-COPY --from=builder /app/auth .
+COPY --from=builder /app/auth_blacklist .
 COPY .env .env 
 
-RUN chmod +x auth
+RUN chmod +x auth_blacklist
 
 EXPOSE 8888
 
-CMD ["./auth"]
+CMD ["./auth_blacklist"]
