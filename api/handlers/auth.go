@@ -177,7 +177,7 @@ func (h *Handlers) ForgotPassword(c *gin.Context) {
 	_, err := h.Auth.ForgotPassword(context.Background(), &req)
 	if err != nil {
 		slog.Error("failed to send password reset email: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -186,7 +186,7 @@ func (h *Handlers) ForgotPassword(c *gin.Context) {
 	err = h.RDB.Set(context.Background(), forgotPasswordCode, req.Email, 15*time.Minute).Err()
 	if err != nil {
 		slog.Error("failed to store forgot password code in Redis: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -200,7 +200,7 @@ func (h *Handlers) ForgotPassword(c *gin.Context) {
 
 	if err != nil {
 		slog.Error("Could not send an email: %v", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -223,7 +223,7 @@ func (h *Handlers) ResetPassword(c *gin.Context) {
 	var req auth.ResetPassReq
 	if err := c.BindJSON(&req); err != nil {
 		slog.Error("failed to bind JSON: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -239,7 +239,7 @@ func (h *Handlers) ResetPassword(c *gin.Context) {
 	email, err := h.RDB.Get(context.Background(), req.ResetToken).Result()
 	if err == redis.Nil {
 		slog.Error("forgot password code not found in Redis: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
