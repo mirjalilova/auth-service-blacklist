@@ -75,7 +75,7 @@ services:
     depends_on:
       - kafka
     ports:
-      - "8888:8888"
+      - "5555:5555"
     networks:
       - ntwrk
     environment:

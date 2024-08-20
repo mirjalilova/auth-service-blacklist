@@ -21,6 +21,6 @@ COPY .env .env
 
 RUN chmod +x auth_blacklist
 
-EXPOSE 8888
+EXPOSE 5555
 
 CMD ["./auth_blacklist"]
