@@ -205,7 +205,7 @@ func (h *Handlers) ForgotPassword(c *gin.Context) {
 	}
 
 	slog.Info("Password reset email sent successfully", "email", req.Email)
-	c.JSON(http.StatusOK, gin.H{"message": "Password reset email sent successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset email sent successful"})
 }
 
 // ResetPassword handles password reset
