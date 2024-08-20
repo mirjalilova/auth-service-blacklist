@@ -1,0 +1,96 @@
+version: '3.9'
+
+services:
+  migrate:
+    image: migrate/migrate
+    networks:
+      - ntwrk
+    volumes:
+      - ./migrations:/migrations
+    command: ["-path", "/migrations", "-database", "postgres://postgres:feruza1727@postgres:5432/black_list?sslmode=disable", "up"]
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: feruza1727
+      PGDATA: /data/postgres
+      POSTGRES_DB: black_list 
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5431:5432"
+    networks:
+      - ntwrk
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5 
+
+  redis:
+    image: "redis:latest"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ntwrk
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    container_name: zookeeper_blacklist
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - ntwrk
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: kafka_blacklist
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    networks:
+      - ntwrk
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper_blacklist:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  
+  auth-service:
+    container_name: auth_blacklist
+    build: .
+    depends_on:
+      - kafka
+    ports:
+      - "8888:8888"
+    networks:
+      - ntwrk
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=feruza1727
+      - DB_NAME=black_list
+      - KAFKA_BROKER=kafka_blacklist:9092
+
+volumes:
+  db:
+
+networks:
+  ntwrk:
+    external: true
+    name: ntwrk
+    driver: bridge
