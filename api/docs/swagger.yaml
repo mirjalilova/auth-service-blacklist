@@ -22,18 +22,20 @@ definitions:
       email:
         type: string
     type: object
+  auth.ListUserRes:
+    properties:
+      count:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/auth.UserRes'
+        type: array
+    type: object
   auth.LoginReq:
     properties:
       password:
         type: string
       username:
-        type: string
-    type: object
-  auth.LoginRes:
-    properties:
-      expires_at:
-        type: string
-      token:
         type: string
     type: object
   auth.RegisterReq:
@@ -148,35 +150,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Login a user
-      tags:
-      - auth
-  /refresh-token:
-    get:
-      consumes:
-      - application/json
-      description: Request to reset user's access token
-      parameters:
-      - description: Email
-        in: query
-        name: email
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/auth.LoginRes'
-        "400":
-          description: Invalid request
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      summary: Refresh Token
       tags:
       - auth
   /register:
@@ -410,6 +383,48 @@ paths:
       summary: Edit user settings
       tags:
       - users
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get all users
+      parameters:
+      - description: UserName
+        in: query
+        name: username
+        type: integer
+      - description: Full Name
+        in: query
+        name: full_name
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.ListUserRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - auth
 securityDefinitions:
   BearerAuth:
     in: header
