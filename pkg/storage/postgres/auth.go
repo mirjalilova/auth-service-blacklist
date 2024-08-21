@@ -119,3 +119,58 @@ func (r *AuthRepo) SaveRefreshToken(req *pb.RefToken) (*pb.Void, error) {
 
     return res, nil
 }
+
+func (r *AuthRepo) GetAllUsers(req *pb.ListUserReq) (*pb.ListUserRes, error) {
+	res := &pb.ListUserRes{}
+
+    query := `SELECT 
+				id, 
+				username, 
+				full_name,
+				email, 
+				date_of_birth,
+				role 
+			FROM 
+				users 
+			WHERE 
+				deleted_at=0`
+
+	var args []interface{}
+
+	if req.Username != "" && req.Username != "string" {
+		args = append(args, req.Username)
+		query += fmt.Sprintf(" AND ILIKE username %$%d%", len(args))
+	}
+
+	if req.FullName != "" && req.FullName != "string" {
+		args = append(args, req.FullName)
+		query += fmt.Sprintf(" AND ILIKE full_name %$%d%", len(args))
+	}
+
+	query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
+	args = append(args, req.Filter.Limit, req.Filter.Offset)
+
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+    for rows.Next() {
+        var user pb.UserRes
+        err := rows.Scan(
+            &user.Id,
+            &user.Username,
+            &user.FullName,
+            &user.Email,
+            &user.DateOfBirth,
+            &user.Role,
+        )
+        if err != nil {
+            return nil, err
+        }
+        res.Users = append(res.Users, &user)
+	}
+
+	return res, nil
+}

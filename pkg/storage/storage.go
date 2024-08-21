@@ -13,6 +13,7 @@ type AuthI interface {
     ForgotPassword(*pb.GetByEmail) (*pb.Void, error)
     ResetPassword(*pb.ResetPassReq) (*pb.Void, error)
     SaveRefreshToken(*pb.RefToken) (*pb.Void, error)
+    GetAllUsers(*pb.ListUserReq) (*pb.ListUserRes, error)
 }
 
 type UserI interface {

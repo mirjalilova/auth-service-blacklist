@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"sync"
 	"time"
 
@@ -269,4 +270,66 @@ func getuserId(ctx *gin.Context) string {
 		return ""
 	}
 	return user_id
+}
+
+// @Summary 		Get all users
+// @Description     Get all users
+// @Tags       	    auth
+// @Accept 			json
+// @Produce 		json
+// @Security 		BearerAuth
+// @Param           username query int false "UserName"
+// @Param           full_name query int false "Full Name"
+// @Param           limit query int false "Limit"
+// @Param           offset query int false "Offset"
+// @Success 200 {object} auth.ListUserRes
+// @Failure 400 {object} string "Bad Request"
+// @Failure 500 {object} string "Internal Server Error"
+// @Router /users [get]
+func (h *Handlers) GetAllUsers(c *gin.Context) {
+	limit := c.Query("limit")
+	offset := c.Query("offset")
+	username := c.Query("username")
+	fullName := c.Query("full_name")
+
+	limitValue := 10
+	offsetValue := 0
+
+	if limit != "" {
+		parsedLimit, err := strconv.Atoi(limit)
+		if err != nil {
+			slog.Error("Invalid limit value", err)
+			c.JSON(400, gin.H{"error": "Invalid limit value"})
+			return
+		}
+		limitValue = parsedLimit
+	}
+
+	if offset != "" {
+		parsedOffset, err := strconv.Atoi(offset)
+		if err != nil {
+			slog.Error("Invalid offset value", err)
+			c.JSON(400, gin.H{"error": "Invalid offset value"})
+			return
+		}
+		offsetValue = parsedOffset
+	}
+
+	req := &auth.ListUserReq{
+		Username: username,
+		FullName: fullName,
+		Filter: &auth.Filter{
+			Limit:  int32(limitValue),
+			Offset: int32(offsetValue),
+		},
+	}
+
+	res, err := h.Auth.GetAllUsers(context.Background(), req)
+	if err != nil {
+		slog.Error("failed to get all users: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
 }

@@ -74,3 +74,14 @@ func (s *AuthService) SaveRefreshToken(ctx context.Context, req *pb.RefToken) (*
 	slog.Info("Refresh token saved successfully")
     return res, nil
 }
+
+func (s *AuthService) GetAllUsers(ctx context.Context, req *pb.ListUserReq) (*pb.ListUserRes, error) {
+	res, err := s.storage.AuthS.GetAllUsers(req)
+    if err!= nil {
+        slog.Error("Error getting all users: %v", err)
+        return nil, err
+    }
+
+    slog.Info("Got all users: %+v", res)
+    return res, nil
+}
