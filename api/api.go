@@ -25,6 +25,7 @@ func Engine(handler *handlers.Handlers) *gin.Engine {
 	router.POST("/login", handler.LoginUser).Use(middleware.Middleware())
 	router.POST("/forgot-password", handler.ForgotPassword)
 	router.POST("/reset-password", handler.ResetPassword)
+	router.GET("/users", handler.GetAllUsers).Use(middleware.JWTMiddleware())
 
 	user := router.Group("/user").Use(middleware.JWTMiddleware())
 	{
