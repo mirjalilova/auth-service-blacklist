@@ -278,8 +278,8 @@ func getuserId(ctx *gin.Context) string {
 // @Accept 			json
 // @Produce 		json
 // @Security 		BearerAuth
-// @Param           username query int false "UserName"
-// @Param           full_name query int false "Full Name"
+// @Param           username query string false "UserName"
+// @Param           full_name query string false "Full Name"
 // @Param           limit query int false "Limit"
 // @Param           offset query int false "Offset"
 // @Success 200 {object} auth.ListUserRes
