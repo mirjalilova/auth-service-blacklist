@@ -21,7 +21,6 @@ func Run(cfg *config.Config) {
 	if err != nil {
 		slog.Error("can't connect to db: %v", err)
 	}
-	defer db.Db.Close()
 	slog.Info("Connected to Postgres")
 
 	// Redis Connection
