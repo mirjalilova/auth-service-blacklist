@@ -392,11 +392,11 @@ paths:
       - description: UserName
         in: query
         name: username
-        type: integer
+        type: string
       - description: Full Name
         in: query
         name: full_name
-        type: integer
+        type: string
       - description: Limit
         in: query
         name: limit

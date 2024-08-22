@@ -498,13 +498,13 @@ const docTemplate = `{
                 "summary": "Get all users",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "UserName",
                         "name": "username",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Full Name",
                         "name": "full_name",
                         "in": "query"
