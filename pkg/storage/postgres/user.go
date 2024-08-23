@@ -175,11 +175,24 @@ func (r *UserRepo) EditSetting(req *pb.SettingReq) (*pb.Void, error) {
 func (r *UserRepo) DeleteUser(req *pb.GetById) (*pb.Void, error) {
 	res := &pb.Void{}
 
+	tr, err := r.db.Begin()
+	if err!= nil {
+        return nil, err
+    }
+
 	query := `UPDATE users SET deleted_at = EXTRACT(EPOCH FROM NOW()) WHERE id = $1`
-	_, err := r.db.Exec(query, req.Id)
+	_, err = tr.Exec(query, req.Id)
 	if err != nil {
+		tr.Rollback()
 		return nil, err
 	}
+
+	query = `DELETE FROM settings WHERE user_id = $1`
+	_, err = tr.Exec(query, req.Id)
+	if err!= nil {
+		tr.Rollback()
+        return nil, err
+    }
 
 	return res, nil
 }
