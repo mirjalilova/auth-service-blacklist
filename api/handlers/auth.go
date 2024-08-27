@@ -148,11 +148,18 @@ func (h *Handlers) LoginUser(c *gin.Context) {
 	}
 
 	token, refToken := t.GenerateJWTToken(res)
+	role, err := md.GetRole(c.Request)
+	if err != nil {
+		slog.Error("failed to get user role: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+        return
+	}
 
 	slog.Info("User logged in successfully", "username", req.Username)
 	c.JSON(http.StatusOK, auth.LoginRes{
 		AccessToken:  token,
 		RefreshToken: refToken,
+		Role: role,
 	})
 }
 
@@ -263,14 +270,6 @@ func isValidEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-func getuserId(ctx *gin.Context) string {
-	user_id, err := md.GetUserId(ctx.Request)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return ""
-	}
-	return user_id
-}
 
 // @Summary 		Get all users
 // @Description     Get all users
@@ -291,7 +290,7 @@ func (h *Handlers) GetAllUsers(c *gin.Context) {
 	offset := c.Query("offset")
 	username := c.Query("username")
 	fullName := c.Query("full_name")
-
+	
 	limitValue := 10
 	offsetValue := 0
 
@@ -304,7 +303,7 @@ func (h *Handlers) GetAllUsers(c *gin.Context) {
 		}
 		limitValue = parsedLimit
 	}
-
+	
 	if offset != "" {
 		parsedOffset, err := strconv.Atoi(offset)
 		if err != nil {
@@ -314,7 +313,7 @@ func (h *Handlers) GetAllUsers(c *gin.Context) {
 		}
 		offsetValue = parsedOffset
 	}
-
+	
 	req := &auth.ListUserReq{
 		Username: username,
 		FullName: fullName,
@@ -323,13 +322,22 @@ func (h *Handlers) GetAllUsers(c *gin.Context) {
 			Offset: int32(offsetValue),
 		},
 	}
-
+	
 	res, err := h.Auth.GetAllUsers(context.Background(), req)
 	if err != nil {
 		slog.Error("failed to get all users: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-
+	
 	c.JSON(http.StatusOK, res)
+}
+
+func getuserId(ctx *gin.Context) string {
+	user_id, err := md.GetUserId(ctx.Request)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return ""
+	}
+	return user_id
 }
