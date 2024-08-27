@@ -148,18 +148,12 @@ func (h *Handlers) LoginUser(c *gin.Context) {
 	}
 
 	token, refToken := t.GenerateJWTToken(res)
-	role, err := md.GetRole(c.Request)
-	if err != nil {
-		slog.Error("failed to get user role: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-        return
-	}
 
 	slog.Info("User logged in successfully", "username", req.Username)
 	c.JSON(http.StatusOK, auth.LoginRes{
 		AccessToken:  token,
 		RefreshToken: refToken,
-		Role: role,
+		Role: res.Role,
 	})
 }
 
