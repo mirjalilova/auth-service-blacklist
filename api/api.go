@@ -1,13 +1,15 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	_ "github.com/mirjalilova/auth-service-blacklist/api/docs"
 	"github.com/mirjalilova/auth-service-blacklist/api/handlers"
 	"github.com/mirjalilova/auth-service-blacklist/api/middleware"
-	_ "github.com/mirjalilova/auth-service-blacklist/api/docs"
 )
 
 // @title Authentication Service API
@@ -18,6 +20,8 @@ import (
 // @name Authorization
 func Engine(handler *handlers.Handlers) *gin.Engine {
 	router := gin.Default()
+
+	router.Use(CORSMiddleware())
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -38,4 +42,19 @@ func Engine(handler *handlers.Handlers) *gin.Engine {
 	}
 
 	return router
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+
+		c.Next()
+	}
 }
