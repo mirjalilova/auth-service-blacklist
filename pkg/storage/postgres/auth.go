@@ -147,6 +147,8 @@ func (r *AuthRepo) GetAllUsers(req *pb.ListUserReq) (*pb.ListUserRes, error) {
 		query += fmt.Sprintf(" AND full_name ILIKE $%d", len(args))
 	}
 
+	req.Filter.Offset = (req.Filter.Offset - 1) * req.Filter.Limit
+
 	query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
 	args = append(args, req.Filter.Limit, req.Filter.Offset)
 
