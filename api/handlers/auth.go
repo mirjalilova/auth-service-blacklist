@@ -286,7 +286,7 @@ func (h *Handlers) GetAllUsers(c *gin.Context) {
 	fullName := c.Query("full_name")
 	
 	limitValue := 10
-	offsetValue := 0
+	offsetValue := 1
 
 	if limit != "" {
 		parsedLimit, err := strconv.Atoi(limit)
