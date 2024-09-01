@@ -143,7 +143,7 @@ func (h *Handlers) LoginUser(c *gin.Context) {
 	res, err := h.Auth.Login(context.Background(), &req)
 	if err != nil {
 		slog.Error("failed to login user: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(400, gin.H{"error": err})
 		return
 	}
 
