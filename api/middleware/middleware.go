@@ -32,17 +32,21 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// if !strings.HasPrefix(authHeader, "Bearer ") {
-		// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header format"})
-		// 	c.Abort()
-		// 	return
-		// }
-
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 		valid, err := t.ValidateToken(tokenString)
-		if err != nil || !valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token", "details": err.Error()})
+		if err != nil {
+			if strings.Contains(err.Error(), "token is expired") {
+				RequireRefresh(c)
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token", "details": err.Error()})
+				c.Abort()
+			}
+			return
+		}
+
+		if !valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}
@@ -58,6 +62,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
 
 func GetUserId(r *http.Request) (string, error) {
 	jwtToken := r.Header.Get("Authorization")
