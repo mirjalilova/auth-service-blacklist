@@ -574,7 +574,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.ListUserRes"
+                            "$ref": "#/definitions/auth.UserRes"
                         }
                     },
                     "400": {
