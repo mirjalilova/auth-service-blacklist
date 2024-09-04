@@ -14,6 +14,7 @@ type AuthI interface {
     ResetPassword(*pb.ResetPassReq) (*pb.Void, error)
     SaveRefreshToken(*pb.RefToken) (*pb.Void, error)
     GetAllUsers(*pb.ListUserReq) (*pb.ListUserRes, error)
+    GetUserById(*pb.GetById) (*pb.UserRes, error)
 }
 
 type UserI interface {

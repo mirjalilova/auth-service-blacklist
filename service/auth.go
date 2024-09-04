@@ -71,3 +71,12 @@ func (s *AuthService) GetAllUsers(ctx context.Context, req *pb.ListUserReq) (*pb
 
 	return res, nil
 }
+
+func (s *AuthService) GetUserById(ctx context.Context, req *pb.GetById) (*pb.UserRes, error) {
+	res, err := s.storage.AuthS.GetUserById(req)
+    if err != nil {
+        return nil, err
+    }
+
+    return res, nil
+}

@@ -185,3 +185,35 @@ func (r *AuthRepo) GetAllUsers(req *pb.ListUserReq) (*pb.ListUserRes, error) {
 
 	return res, nil
 }
+
+func (r *AuthRepo) GetUserById(req *pb.GetById) (*pb.UserRes, error) {
+	res := &pb.UserRes{}
+
+    query := `SELECT 
+                id, 
+                username, 
+                full_name,
+                email, 
+                date_of_birth,
+                role 
+            FROM 
+                users 
+            WHERE 
+                id = $1 AND deleted_at=0`
+
+    err := r.db.QueryRow(query, req.Id).Scan(
+        &res.Id,
+        &res.Username,
+        &res.FullName,
+        &res.Email,
+        &res.DateOfBirth,
+        &res.Role,
+    )
+    if err == sql.ErrNoRows {
+        return nil, fmt.Errorf("user not found")
+    } else if err!= nil {
+        return nil, err
+    }
+
+    return res, nil
+}
