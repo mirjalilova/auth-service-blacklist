@@ -335,3 +335,33 @@ func getuserId(ctx *gin.Context) string {
 	}
 	return user_id
 }
+
+// @Summary 		Get user
+// @Description     Get user
+// @Tags       	    auth
+// @Accept 			json
+// @Produce 		json
+// @Security 		BearerAuth
+// @Param           user_id query int false "User Id"
+// @Success 200 {object} auth.ListUserRes
+// @Failure 400 {object} string "Bad Request"
+// @Failure 500 {object} string "Internal Server Error"
+// @Router /{user_id} [get]
+func (h *Handlers) GetUser(c *gin.Context) {
+	userId := c.Query("user_id")
+
+	req := &auth.GetById{
+        Id: userId,
+    }
+
+	res, err := h.Auth.GEtUserById(context.Background(), req)
+	if err!= nil {
+        slog.Error("failed to get user: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+        return
+    }
+
+	slog.Info("User retrieved successfully")
+	c.JSON(http.StatusOK, res)
+}
+	
