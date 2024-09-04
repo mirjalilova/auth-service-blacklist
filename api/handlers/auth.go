@@ -342,7 +342,7 @@ func getuserId(ctx *gin.Context) string {
 // @Accept 			json
 // @Produce 		json
 // @Security 		BearerAuth
-// @Param           user_id query int false "User Id"
+// @Param           user_id query string true "User Id"
 // @Success 200 {object} auth.UserRes
 // @Failure 400 {object} string "Bad Request"
 // @Failure 500 {object} string "Internal Server Error"
