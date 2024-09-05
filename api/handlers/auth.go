@@ -72,7 +72,7 @@ func (h *Handlers) RegisterUser(c *gin.Context) {
 	password, err := t.HashPassword(body.Password)
 	if err != nil {
 		slog.Error("failed to hash password: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -106,7 +106,7 @@ func (h *Handlers) RegisterUser(c *gin.Context) {
 	err = h.Producer.ProduceMessages("reg-user", input)
 	if err != nil {
 		slog.Error("failed to produce message: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(404, gin.H{"error": err})
 		return
 	}
 
@@ -179,7 +179,7 @@ func (h *Handlers) ForgotPassword(c *gin.Context) {
 	_, err := h.Auth.ForgotPassword(context.Background(), &req)
 	if err != nil {
 		slog.Error("failed to send password reset email: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(404, gin.H{"error": err})
 		return
 	}
 
@@ -188,7 +188,7 @@ func (h *Handlers) ForgotPassword(c *gin.Context) {
 	err = h.RDB.Set(context.Background(), forgotPasswordCode, req.Email, 15*time.Minute).Err()
 	if err != nil {
 		slog.Error("failed to store forgot password code in Redis: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(404, gin.H{"error": err})
 		return
 	}
 
@@ -202,7 +202,7 @@ func (h *Handlers) ForgotPassword(c *gin.Context) {
 
 	if err != nil {
 		slog.Error("Could not send an email: %v", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(404, gin.H{"error": err})
 		return
 	}
 
@@ -232,7 +232,7 @@ func (h *Handlers) ResetPassword(c *gin.Context) {
 	password, err := t.HashPassword(req.NewPassword)
 	if err != nil {
 		slog.Error("failed to hash password: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(404, gin.H{"error": err})
 		return
 	}
 
@@ -250,7 +250,7 @@ func (h *Handlers) ResetPassword(c *gin.Context) {
 	_, err = h.Auth.ResetPassword(context.Background(), &req)
 	if err != nil {
 		slog.Error("failed to reset password: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -320,7 +320,7 @@ func (h *Handlers) GetAllUsers(c *gin.Context) {
 	res, err := h.Auth.GetAllUsers(context.Background(), req)
 	if err != nil {
 		slog.Error("failed to get all users: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(404, gin.H{"error": err})
 		return
 	}
 	
@@ -330,7 +330,7 @@ func (h *Handlers) GetAllUsers(c *gin.Context) {
 func getuserId(ctx *gin.Context) string {
 	user_id, err := md.GetUserId(ctx.Request)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(404, gin.H{"error": err.Error()})
 		return ""
 	}
 	return user_id
@@ -357,7 +357,7 @@ func (h *Handlers) GetUser(c *gin.Context) {
 	res, err := h.Auth.GEtUserById(context.Background(), req)
 	if err!= nil {
         slog.Error("failed to get user: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+        c.JSON(404, gin.H{"error": err})
         return
     }
 

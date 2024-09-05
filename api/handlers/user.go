@@ -32,7 +32,7 @@ func (h *Handlers) GetProfile(c *gin.Context) {
 	profile, err := h.User.GetProfile(c, req)
 	if err != nil {
 		slog.Error("Error getting profile:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -79,7 +79,7 @@ func (h *Handlers) EditProfile(c *gin.Context) {
 
 	err = h.Producer.ProduceMessages("upd-user", input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(404, gin.H{"error": err})
 		return
 	}
 
@@ -112,7 +112,7 @@ func (h *Handlers) ChangePassword(c *gin.Context) {
 	password, err := t.HashPassword(body.NewPassword)
 	if err != nil {
 		slog.Error("failed to hash password: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -134,7 +134,7 @@ func (h *Handlers) ChangePassword(c *gin.Context) {
 	err = h.Producer.ProduceMessages("upd-pass", input)
 	if err != nil {
 		slog.Error("Error producing message:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -163,7 +163,7 @@ func (h *Handlers) GetSetting(c *gin.Context) {
 	setting, err := h.User.GetSetting(c, req)
 	if err != nil {
 		slog.Error("Error getting setting:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -211,7 +211,7 @@ func (h *Handlers) EditSetting(c *gin.Context) {
 	err = h.Producer.ProduceMessages("upd-setting", input)
 	if err != nil {
 		slog.Error("Error producing message:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -240,7 +240,7 @@ func (h *Handlers) DeleteUser(c *gin.Context) {
 	_, err := h.User.DeleteUser(c, req)
 	if err != nil {
 		slog.Error("Error deleting user:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		c.JSON(404, gin.H{"error": "internal server error"})
 		return
 	}
 

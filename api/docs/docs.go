@@ -564,10 +564,11 @@ const docTemplate = `{
                 "summary": "Get user",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User Id",
                         "name": "user_id",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {

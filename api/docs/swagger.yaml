@@ -99,7 +99,8 @@ paths:
       - description: User Id
         in: query
         name: user_id
-        type: integer
+        required: true
+        type: string
       produces:
       - application/json
       responses:
